@@ -1,19 +1,21 @@
 
 # Purple Air 
 
-This is a node server to pull AQI data from the Purple Air network and make it available to a [Universal Devices ISY994i](https://www.universal-devices.com/residential/ISY) [Polyglot interface](http://www.universal-devices.com/developers/polyglot/docs/) with  [Polyglot V2](https://github.com/Einstein42/udi-polyglotv2)
+This is a node server to pull AQI data from the Purple Air network and make it
+available to a [Universal Devices ISY994i](https://www.universal-devices.com/residential/ISY)
+[Polyglot interface](http://www.universal-devices.com/developers/polyglot/docs/) with 
+Polyglot V3 running on a [Polisy](https://www.universal-devices.com/product/polisy/)
 
-(c) 2020 Robert Paauwe
+(c) 2020,2021 Robert Paauwe
 
 ## Installation
 
 1. Backup Your ISY in case of problems!
    * Really, do the backup, please
 2. Go to the Polyglot Store in the UI and install.
-3. Add NodeServer in Polyglot Web
-   * After the install completes, Polyglot will reboot your ISY, you can watch the status in the main polyglot log.
-4. Once your ISY is back up open the Admin Console.
-5. Configure the node server per configuration section below.
+3. From the Polyglot dashboard, select the Purple Air node server and configure (see configuration options below).
+4. Once configured, the Purple Air node server should update the ISY with the proper nodes and begin filling in the node data.
+5. Restart the Admin Console so that it can properly display the new node server nodes.
 
 ### Node Settings
 The settings for this node are:
@@ -47,19 +49,13 @@ The settings for this node are:
 
 
 ## Requirements
-1. Polyglot V2.
-2. ISY firmware 5.0.x or later
-
-# Upgrading
-
-Open the Polyglot web page, go to nodeserver store and click "Update" for "Purple Air".
-
-Then restart the Purple Air nodeserver by selecting it in the Polyglot dashboard and select Control -> Restart, then watch the log to make sure everything goes well.
-
-The nodeserver keeps track of the version number and when a profile rebuild is necessary.  The profile/version.txt will contain the profile_version which is updated in server.json when the profile should be rebuilt.
+1. Polyglot V3.
+2. ISY firmware 5.3.x or later
 
 # Release Notes
 
+- 2.0.0 03/01/2021
+   - Updated to run on Polyglot Version 3
 - 1.0.4 08/31/2020
    - Fix confidence level calculation
 - 1.0.3 08/31/2020

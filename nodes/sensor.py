@@ -1,30 +1,23 @@
 #!/usr/bin/env python3
 """
-Polyglot v2 node server Purple Air data
-Copyright (C) 2020 Robert Paauwe
+Polyglot v3 node server Purple Air data
+Copyright (C) 2020,2021 Robert Paauwe
 """
 
-try:
-    import polyinterface
-except ImportError:
-    import pgc_interface as polyinterface
-
+import udi_interface
 import requests
 import json
-import node_funcs
 
-LOGGER = polyinterface.LOGGER
+LOGGER = udi_interface.LOGGER
 
-@node_funcs.add_functions_as_methods(node_funcs.functions)
-class SensorNode(polyinterface.Node):
+class SensorNode(udi_interface.Node):
     # class variables
     id = 'aqi'
-    hint = [0,0,0,0]
     status= None
 
-    def __init__(self, controller, primary, address, name):
+    def __init__(self, polyglot, primary, address, name):
         # call the default init
-        super(SensorNode, self).__init__(controller, primary, address, name)
+        super(SensorNode, self).__init__(polyglot, primary, address, name)
 
         self.host = ''
         self.configured = False;
@@ -46,6 +39,8 @@ class SensorNode(polyinterface.Node):
                 'GV11' : 25,
                 'GV12' : 51,
                 }
+
+        polyglot.subscribe(polyglot.POLL, self.poll)
 
 
     drivers = [
@@ -69,6 +64,15 @@ class SensorNode(polyinterface.Node):
     def configure(self, sensor):
         self.host = 'https://www.purpleair.com/json?show=' + sensor
         self.configured = True
+
+    def update_driver(self, driver, value, force=False, prec=3):
+        try:
+            if value == None or value == "None":
+                value = "0"
+            self.setDriver(driver, round(float(value), prec), True, force, self.uom[driver])
+            LOGGER.debug('setDriver (%s, %f)' %(driver, float(value)))
+        except:
+            LOGGER.warning('Missing data for driver ' + driver)
 
     def epa_aqi(self, pm25):
         aqi = 0
@@ -134,14 +138,15 @@ class SensorNode(polyinterface.Node):
             return 0
 
 
-    def shortPoll(self):
+    def poll(self, polltype):
         # Query for the current air quality conditions. We can do this fairly
         # frequently, probably as often as once a minute.
+        if polltype is not 'shortPoll':
+            return
 
         if not self.configured:
             LOGGER.info('Skipping connection because we aren\'t configured yet.')
             return
-
 
         try:
             c = requests.get(self.host)
@@ -216,3 +221,9 @@ class SensorNode(polyinterface.Node):
             LOGGER.error('Current observation update failure')
             LOGGER.error(e)
 
+    def query(self, cmd=None):
+        self.poll('shortPoll')
+
+    commands = {
+            'QUERY': query,
+            }

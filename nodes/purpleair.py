@@ -1,93 +1,89 @@
 #!/usr/bin/env python3
 """
-Polyglot v2 node server Purple Air data
-Copyright (C) 2020 Robert Paauwe
+Polyglot v3 node server Purple Air data
+Copyright (C) 2020,2021 Robert Paauwe
 """
 
-try:
-    import polyinterface
-except ImportError:
-    import pgc_interface as polyinterface
+import udi_interface
 import sys
 import time
-import datetime
-import requests
-import socket
-import math
-import re
-import json
-import node_funcs
+#import datetime
+#import requests
+#import socket
+#import math
+#import re
+#import json
 from nodes import sensor
-from datetime import timedelta
+#from datetime import timedelta
 
-LOGGER = polyinterface.LOGGER
+LOGGER = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
-@node_funcs.add_functions_as_methods(node_funcs.functions)
-class Controller(polyinterface.Controller):
+class Controller(udi_interface.Controller):
     id = 'controller'
-    hint = [0,0,0,0]
-    def __init__(self, polyglot):
-        super(Controller, self).__init__(polyglot)
-        self.name = 'Purple Air AQI'
-        self.address = 'pa'
-        self.primary = self.address
+    def __init__(self, polyglot, primary, address, name):
+        super(Controller, self).__init__(polyglot, primary, address, name)
+        self.poly = polyglot
+        self.name = name
+        self.address = address
+        self.primary = primary
         self.configured = False
         self.force = True
         self.sensor_list = {}
         self.in_config = False
         self.in_discover = False
 
-        self.poly.onConfig(self.process_config)
+        self.Parameters = Custom(polyglot, 'customparams')
+        self.Notices = Custom(polyglot, 'notices')
+
+        self.poly.subscribe(self.poly.CUSTOMPARAMS, self.parameterHandler)
+        self.poly.subscribe(self.poly.START, self.start, self.address)
+        # TODO: sensor nodes should subscribe to POLL!
+        #self.poly.subscribe(self.poly.POLL, self.poll)
+
+        self.poly.ready()
+        self.poly.addNode(self)
 
     # Process changes to customParameters
-    def process_config(self, config):
-        rediscover = False
-        if self.in_config:
+    def parameterHander(self, params):
+        self.configured = False
+        discover = False
+        self.Parameters.load(params)
+
+        # How to detect that self.Parameters is empty?
+        if len(self.Parameters) == 0:
+            self.Notices['cfg'] = 'Enter sensor name and ID to configure.'
             return
 
-        self.in_config = True
-        if 'customParams' in self.polyConfig:
-            for sensor_name in self.polyConfig['customParams']:
-                LOGGER.info('Found Purple Air sensor ID ' + sensor_name + ' with ID ' + self.polyConfig['customParams'][sensor_name])
-                if sensor_name not in self.sensor_list:
-                    sensor_id = self.polyConfig['customParams'][sensor_name]
-                    self.sensor_list[sensor_name] = {'id': sensor_id, 'configured': False}
-                    rediscover = True
+        # parameters should be alist of sensor name / sensor id
+        for p in self.Parameters:
+            self.configured = True
+            LOGGER.info('Found Purple Air sensor ID {} with ID {}'.format(p, self.Parameters[p]))
+            if p not in self.sensor_list:
+                self.sensor_list[p] = {'id': self.Parameters[p], 'configured': False}
+                discover = True
+            elif self.Parameters.isChanged(p):
+                self.sensor_list[p] = {'id': self.Parameters[p], 'configured': False}
+                discover = True
 
-        if rediscover:
+        if discover:
             self.discover()
-            self.shortPoll()
 
-        self.in_config = False
 
     def start(self):
         LOGGER.info('Starting node server')
-        self.set_logging_level()
-        self.check_params()
-        self.discover()
+        self.poly.updateProfile()
+        self.poly.setCustomparamsDoc()
+
         LOGGER.info('Node server started')
-        self.force = False
 
-        self.shortPoll()
-
-    def longPoll(self):
-        LOGGER.debug('longpoll')
-
-    def shortPoll(self):
-        for node in self.nodes:
-            if self.nodes[node].address != self.address:
-                self.nodes[node].shortPoll()
-
+    # control node has nothing to query, can we remove this?
     def query(self):
         for node in self.nodes:
             self.nodes[node].reportDrivers()
 
     def discover(self, *args, **kwargs):
         # Create nodes for each sensor here
-        if self.in_discover:
-            return
-
-        self.in_discover = True
         LOGGER.info("In Discovery...")
         for sensor_name in self.sensor_list:
             LOGGER.debug(self.sensor_list[sensor_name])
@@ -104,9 +100,6 @@ class Controller(polyinterface.Controller):
             except Exception as e:
                 LOGGER.error(str(e))
 
-        self.in_discover = False
-
-
     # Delete the node server from Polyglot
     def delete(self):
         LOGGER.info('Removing node server')
@@ -118,65 +111,12 @@ class Controller(polyinterface.Controller):
         st = self.poly.installprofile()
         return st
 
-    def check_params(self):
-        if 'customParams' in self.polyConfig:
-            for sensor_name in self.polyConfig['customParams']:
-                LOGGER.info('Found Purple Air sensor ID ' + sensor_name + ' with ID ' + self.polyConfig['customParams'][sensor_name])
-                if sensor_name not in self.sensor_list:
-                    sensor_id = self.polyConfig['customParams'][sensor_name]
-                    self.sensor_list[sensor_name] = {'id': sensor_id, 'configured': False}
-        else:
-            LOGGER.error('Config not found')
-
-        self.removeNoticesAll()
-
-    def remove_notices_all(self, command):
-        self.removeNoticesAll()
-
-    def set_logging_level(self, level=None):
-        if level is None:
-            try:
-                # level = self.getDriver('GVP')
-                level = self.get_saved_log_level()
-            except:
-                LOGGER.error('set_logging_level: get saved log level failed.')
-
-            if level is None:
-                level = 30
-
-            level = int(level)
-        else:
-            level = int(level['value'])
-
-        # self.setDriver('GVP', level, True, True)
-        self.save_log_level(level)
-        LOGGER.info('set_logging_level: Setting log level to %d' % level)
-        LOGGER.setLevel(level)
-
     commands = {
             'UPDATE_PROFILE': update_profile,
-            'REMOVE_NOTICES_ALL': remove_notices_all,
-            'DEBUG': set_logging_level,
             }
 
-    # For this node server, all of the info is available in the single
-    # controller node.
     drivers = [
             {'driver': 'ST', 'value': 1, 'uom': 2},   # node server status
-            {'driver': 'CLITEMP', 'value': 0, 'uom': 17},  # temperature
-            {'driver': 'CLIHUM', 'value': 0, 'uom': 22},   # humidity
-            {'driver': 'BARPRES', 'value': 0, 'uom': 117}, # pressure
-            {'driver': 'GV0', 'value': 0, 'uom': 56},      # current PM2.5
-            {'driver': 'GV1', 'value': 0, 'uom': 10},      # age in days
-            {'driver': 'GV3', 'value': 0, 'uom': 56},      # 10 min avg
-            {'driver': 'GV4', 'value': 0, 'uom': 56},      # 30 min avg
-            {'driver': 'GV5', 'value': 0, 'uom': 56},      # 60 min avg
-            {'driver': 'GV6', 'value': 0, 'uom': 56},      # 6 hr avg
-            {'driver': 'GV7', 'value': 0, 'uom': 56},      # 24 hr avg
-            {'driver': 'GV8', 'value': 0, 'uom': 56},      # 1 week avg
-            {'driver': 'GV10', 'value': 0, 'uom': 56},     # AQI
-            {'driver': 'GV11', 'value': 0, 'uom': 25},     # AQI string
-            {'driver': 'GV12', 'value': 0, 'uom': 51},     # confidence
             ]
 
 

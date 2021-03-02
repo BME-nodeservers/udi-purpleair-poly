@@ -1,21 +1,29 @@
 {
     "name": "PurpleAir",
-    "docs": "https://github.com/bpaauwe/udi-purpleair-poly",
+    "docs": "https://github.com/BME-nodeservers/udi-purpleair-poly",
     "type": "python3",
     "executable": "purple.py",
     "install": "install.sh",
-    "install_cloud": "install_cloud.sh",
     "description": "Add air quality data to the ISY994",
     "notice": "",
     "shortPoll": "600",
     "longPoll": "3600",
-    "profile_version": "1.0.2",
+    "profile_version": "2.0.0",
     "credits": [ {
+	"customParams": {
+	},
 	"title": "Purple Air: a node server for air quality data",
     	"author": "Bob Paauwe",
-    	"version": "1.0.4",
-    	"date": "August 31, 2020",
-    	"source": "https://github.com/bpaauwe/udi-purpleair-poly",
-	    "license": "https://github.com/bpaauwe/udi-purpleair-poly/LICENSE"
-	} ]
+    	"version": "2.0.0",
+    	"date": "March 1, 2021",
+    	"source": "https://github.com/BME-nodeservers/udi-purpleair-poly",
+	    "license": "https://github.com/BME-nodeservers/udi-purpleair-poly/LICENSE"
+	} ],
+	"store": {
+		"developer": "bpaauwe@bobsplace.com",
+		"price": 5.00,
+		"recurring": 0,
+		"recurring_interval": "month",
+		"recurring_period": 0
+	}
 }
