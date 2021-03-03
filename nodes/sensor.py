@@ -41,6 +41,7 @@ class SensorNode(udi_interface.Node):
                 }
 
         polyglot.subscribe(polyglot.POLL, self.poll)
+        polyglot.subscribe(polyglot.START, self.start, address)
 
 
     drivers = [
@@ -60,6 +61,9 @@ class SensorNode(udi_interface.Node):
             {'driver': 'GV12', 'value': 0, 'uom': 51},     # confidence
             ]
 
+
+    def start(self):
+        self.poll('shortPoll')
 
     def configure(self, sensor):
         self.host = 'https://www.purpleair.com/json?show=' + sensor

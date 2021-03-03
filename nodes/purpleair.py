@@ -19,7 +19,7 @@ from nodes import sensor
 LOGGER = udi_interface.LOGGER
 Custom = udi_interface.Custom
 
-class Controller(udi_interface.Controller):
+class Controller(udi_interface.Node):
     id = 'controller'
     def __init__(self, polyglot, primary, address, name):
         super(Controller, self).__init__(polyglot, primary, address, name)
@@ -45,7 +45,7 @@ class Controller(udi_interface.Controller):
         self.poly.addNode(self)
 
     # Process changes to customParameters
-    def parameterHander(self, params):
+    def parameterHandler(self, params):
         self.configured = False
         discover = False
         self.Parameters.load(params)
@@ -56,6 +56,7 @@ class Controller(udi_interface.Controller):
             return
 
         # parameters should be alist of sensor name / sensor id
+        self.Notices.clear()
         for p in self.Parameters:
             self.configured = True
             LOGGER.info('Found Purple Air sensor ID {} with ID {}'.format(p, self.Parameters[p]))
@@ -73,7 +74,10 @@ class Controller(udi_interface.Controller):
     def start(self):
         LOGGER.info('Starting node server')
         self.poly.updateProfile()
-        self.poly.setCustomparamsDoc()
+        self.poly.setCustomParamsDoc()
+
+        if len(self.Parameters) == 0:
+            self.Notices['cfg'] = 'Enter sensor name and ID to configure.'
 
         LOGGER.info('Node server started')
 
@@ -92,10 +96,10 @@ class Controller(udi_interface.Controller):
                 continue
 
             try:
-                node = sensor.SensorNode(self, self.address, self.sensor_list[sensor_name]['id'], sensor_name)
+                node = sensor.SensorNode(self.poly, self.address, self.sensor_list[sensor_name]['id'], sensor_name)
                 node.configure(self.sensor_list[sensor_name]['id'])
                 LOGGER.info('Adding new node for ' + sensor_name)
-                self.addNode(node)
+                self.poly.addNode(node)
                 self.sensor_list[sensor_name]['configured'] = True
             except Exception as e:
                 LOGGER.error(str(e))
