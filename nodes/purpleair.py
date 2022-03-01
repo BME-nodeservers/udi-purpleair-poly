@@ -83,8 +83,7 @@ class Controller(udi_interface.Node):
 
     # control node has nothing to query, can we remove this?
     def query(self):
-        for node in self.nodes:
-            self.nodes[node].reportDrivers()
+        self.reportDrivers()
 
     def discover(self, *args, **kwargs):
         # Create nodes for each sensor here

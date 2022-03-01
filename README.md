@@ -54,6 +54,8 @@ The settings for this node are:
 
 # Release Notes
 
+- 2.0.1 03/01/2022
+   - fix query for main node.
 - 2.0.0 03/01/2021
    - Updated to run on Polyglot Version 3
 - 1.0.4 08/31/2020
