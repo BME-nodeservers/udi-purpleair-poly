@@ -32,6 +32,7 @@ class Controller(udi_interface.Node):
         self.sensor_list = {}
         self.in_config = False
         self.in_discover = False
+        self.apikey = ''
 
         self.Parameters = Custom(polyglot, 'customparams')
         self.Notices = Custom(polyglot, 'notices')
@@ -42,7 +43,7 @@ class Controller(udi_interface.Node):
         #self.poly.subscribe(self.poly.POLL, self.poll)
 
         self.poly.ready()
-        self.poly.addNode(self)
+        self.poly.addNode(self, conn_status="ST")
 
     # Process changes to customParameters
     def parameterHandler(self, params):
@@ -53,6 +54,7 @@ class Controller(udi_interface.Node):
         # How to detect that self.Parameters is empty?
         if len(self.Parameters) == 0:
             self.Notices['cfg'] = 'Enter sensor name and ID to configure.'
+            self.Notices['api'] = 'Enter API key'
             return
 
         # parameters should be alist of sensor name / sensor id
@@ -60,12 +62,18 @@ class Controller(udi_interface.Node):
         for p in self.Parameters:
             self.configured = True
             LOGGER.info('Found Purple Air sensor ID {} with ID {}'.format(p, self.Parameters[p]))
-            if p not in self.sensor_list:
+            if p == 'APIKey':
+                self.apikey = self.Parameters[p]
+            elif p not in self.sensor_list:
                 self.sensor_list[p] = {'id': self.Parameters[p], 'configured': False}
                 discover = True
             elif self.Parameters.isChanged(p):
                 self.sensor_list[p] = {'id': self.Parameters[p], 'configured': False}
                 discover = True
+
+        if self.apikey == '':
+            self.Notices['api'] = 'Enter API key'
+            discover = False
 
         if discover:
             self.discover()
@@ -96,7 +104,7 @@ class Controller(udi_interface.Node):
 
             try:
                 node = sensor.SensorNode(self.poly, self.address, self.sensor_list[sensor_name]['id'], sensor_name)
-                node.configure(self.sensor_list[sensor_name]['id'])
+                node.configure(self.sensor_list[sensor_name]['id'], self.apikey)
                 LOGGER.info('Adding new node for ' + sensor_name)
                 self.poly.addNode(node)
                 self.sensor_list[sensor_name]['configured'] = True
@@ -119,7 +127,7 @@ class Controller(udi_interface.Node):
             }
 
     drivers = [
-            {'driver': 'ST', 'value': 1, 'uom': 2},   # node server status
+            {'driver': 'ST', 'value': 0, 'uom': 25},   # node server status
             ]
 
 
