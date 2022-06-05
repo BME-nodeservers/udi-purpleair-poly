@@ -25,6 +25,10 @@ ST-sensor-GV10-NAME = EPA AQI
 ST-sensor-GV11-NAME = EPA AQI Category
 ST-sensor-GV12-NAME = Data Confidence
 
+STATUS-0 = Disconnected
+STATUS-1 = Connected
+STATUS-2 = Failed
+
 AQI-0 = Good
 AQI-51 = Moderate
 AQI-101 = Unhealthy for sensitive groups
