@@ -1,7 +1,7 @@
 
-# Purple Air 
+# PurpleAir 
 
-This is a node server to pull AQI data from the Purple Air network and make it
+This is a node server to pull AQI data from the PurpleAir network and make it
 available to a [Universal Devices ISY994i](https://www.universal-devices.com/residential/ISY)
 [Polyglot interface](http://www.universal-devices.com/developers/polyglot/docs/) with 
 Polyglot V3 running on a [Polisy](https://www.universal-devices.com/product/polisy/)
@@ -13,19 +13,20 @@ Polyglot V3 running on a [Polisy](https://www.universal-devices.com/product/poli
 1. Backup Your ISY in case of problems!
    * Really, do the backup, please
 2. Go to the Polyglot Store in the UI and install.
-3. From the Polyglot dashboard, select the Purple Air node server and configure (see configuration options below).
-4. Once configured, the Purple Air node server should update the ISY with the proper nodes and begin filling in the node data.
+3. From the Polyglot dashboard, select the PurpleAir node server and configure (see configuration options below).
+4. Once configured, the PurpleAir node server should update the ISY with the proper nodes and begin filling in the node data.
 5. Restart the Admin Console so that it can properly display the new node server nodes.
 
 ### Node Settings
 The settings for this node are:
 
 #### Short Poll
-   * How often to poll the Purple Air service for current AQI data (in seconds)
+   * How often to poll the PurpleAir service for current AQI data (in seconds)
 #### Long Poll
    * Not used
 #### Custom Parameters
-	* A list of Purple Air devices to monitor. For the 'key', enter a name to use to identify the device (under 14 characters, no special characters). For the 'value' enter the Purple Air sensor ID. This is typically just a number.
+   * A READ API Key from PurpleAir
+   * A list of PurpleAir devices to monitor. For the 'key', enter a name to use to identify the device (under 14 characters, no special characters). For the 'value' enter the PurpleAir sensor ID. This is typically just a number.
 
 ## Node substitution variables
 ### Controller node
