@@ -218,7 +218,7 @@ class SensorNode(udi_interface.Node):
                 stats = sensor['stats']
                 if 'pm2.5_10minute' in stats:
                     self.update_driver('GV3', stats['pm2.5_10minute'])
-                    (aqi, idx) = self.epa_aqi(float(sensor['pm2.5_10minute']))
+                    (aqi, idx) = self.epa_aqi(float(stats['pm2.5_10minute']))
                     self.update_driver('GV10', aqi)
                     self.update_driver('GV11', idx)
                 if 'pm2.5_30minute' in stats:
