@@ -39,4 +39,26 @@
 	</cmds>
   </nodeDef>
 
+  <nodeDef id="laqi" nodeType="139" nls="local">
+    <editors />
+    <sts>
+      <st id="PM25" editor="AQI" />
+      <st id="PM10" editor="AQI" />
+      <st id="GV0" editor="AQI" />
+      <st id="CLITEMP" editor="TEMPERATURE" />
+      <st id="CLIHUM" editor="PERCENT" />
+      <st id="BARPRES" editor="PRESSURE" />
+      <st id="DEWPT" editor="TEMPERATURE" />
+      <st id="AQI" editor="EPAAQI" />
+      <st id="GV11" editor="AQISTR" />
+      <st id="GV12" editor="CONFIDENCE" />
+    </sts>
+	<cmds>
+		<sends/>
+		<accepts>
+			<cmd id="QUERY" />
+		</accepts>
+	</cmds>
+  </nodeDef>
+
 </nodeDefs>

@@ -3,7 +3,7 @@
         <range uom="25" subset="0,1,2" nls="STATUS" />
     </editor>
     <editor id="AQI">
-        <range uom="56" min="0" max="600" prec="3" />
+        <range uom="122" min="0" max="600" prec="3" />
     </editor>
     <editor id="EPAAQI">
         <range uom="56" min="0" max="500" prec="0" />

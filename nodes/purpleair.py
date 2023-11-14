@@ -7,14 +7,9 @@ Copyright (C) 2020,2021 Robert Paauwe
 import udi_interface
 import sys
 import time
-#import datetime
-#import requests
-#import socket
-#import math
-#import re
-#import json
+import socket
 from nodes import sensor
-#from datetime import timedelta
+from nodes import local
 
 LOGGER = udi_interface.LOGGER
 Custom = udi_interface.Custom
@@ -71,9 +66,11 @@ class Controller(udi_interface.Node):
                 self.sensor_list[p] = {'id': self.Parameters[p], 'configured': False}
                 discover = True
 
+        '''
         if self.apikey == '':
             self.Notices['api'] = 'Enter API key'
             discover = False
+        '''
 
         if discover:
             self.discover()
@@ -93,6 +90,14 @@ class Controller(udi_interface.Node):
     def query(self):
         self.reportDrivers()
 
+    def valid_ip(self, ip_to_check):
+        try:
+            socket.inet_aton(ip_to_check)
+            return True
+        except Exception as e:
+            LOGGER.error('valid ip: exception: {}'.format(e))
+            return False
+
     def discover(self, *args, **kwargs):
         # Create nodes for each sensor here
         LOGGER.info("In Discovery...")
@@ -103,8 +108,13 @@ class Controller(udi_interface.Node):
                 continue
 
             try:
-                node = sensor.SensorNode(self.poly, self.address, self.sensor_list[sensor_name]['id'], sensor_name)
-                node.configure(self.sensor_list[sensor_name]['id'], self.apikey)
+                if self.valid_ip(self.sensor_list[sensor_name]['id']):
+                    address = 'local_' + self.sensor_list[sensor_name]['id'].split('.')[3]
+                    node = local.LocalSensorNode(self.poly, self.address, address, sensor_name)
+                    node.configure(self.sensor_list[sensor_name]['id'])
+                else:
+                    node = sensor.SensorNode(self.poly, self.address, self.sensor_list[sensor_name]['id'], sensor_name)
+                    node.configure(self.sensor_list[sensor_name]['id'], self.apikey)
                 LOGGER.info('Adding new node for ' + sensor_name)
                 self.poly.addNode(node)
                 self.sensor_list[sensor_name]['configured'] = True
@@ -127,7 +137,7 @@ class Controller(udi_interface.Node):
             }
 
     drivers = [
-            {'driver': 'ST', 'value': 0, 'uom': 25},   # node server status
+            {'driver': 'ST', 'value': 1, 'uom': 25},   # node server status
             ]
 
 

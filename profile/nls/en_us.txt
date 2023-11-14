@@ -25,6 +25,20 @@ ST-sensor-GV10-NAME = EPA AQI
 ST-sensor-GV11-NAME = EPA AQI Category
 ST-sensor-GV12-NAME = Data Confidence
 
+ND-laqi-NAME = Air Quality
+ND-laqi-ICON = Input
+CMD-local-QUERY-NAME = Query
+ST-local-CLITEMP-NAME = Temperature
+ST-local-CLIHUM-NAME = Humidity
+ST-local-BARPRES-NAME = Pressure
+ST-local-DEWPT-NAME = Dewpoint
+ST-local-PM25-NAME = Current PM2.5
+ST-local-PM10-NAME = Current PM1.0
+ST-local-GV0-NAME = Current PM10
+ST-local-AQI-NAME = EPA AQI
+ST-local-GV11-NAME = EPA AQI Category
+ST-local-GV12-NAME = Data Confidence
+
 STATUS-0 = Disconnected
 STATUS-1 = Connected
 STATUS-2 = Failed
