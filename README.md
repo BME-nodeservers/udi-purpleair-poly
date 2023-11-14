@@ -1,38 +1,45 @@
 
 # PurpleAir 
 
-This is a node server to pull AQI data from the PurpleAir network and make it
-available to a [Universal Devices ISY994i](https://www.universal-devices.com/residential/ISY)
-[Polyglot interface](http://www.universal-devices.com/developers/polyglot/docs/) with 
-Polyglot V3 running on a [Polisy](https://www.universal-devices.com/product/polisy/)
+This is a plug-in to access AQI data from the PurpleAir air monitoring sensors.  
 
-(c) 2020,2021 Robert Paauwe
+The plug-in can be configured to get the data from a sensor on your local network or
+it can query the PurpleAir cloud servers.
 
-## Installation
+To access data from the PurpleAir cloud severs you need to create an account to
+get a READ API key.  See https://develop.purpleair.com/.  
 
-1. Backup Your ISY in case of problems!
-   * Really, do the backup, please
-2. Go to the Polyglot Store in the UI and install.
-3. From the Polyglot dashboard, select the PurpleAir node server and configure (see configuration options below).
-4. Once configured, the PurpleAir node server should update the ISY with the proper nodes and begin filling in the node data.
-5. Restart the Admin Console so that it can properly display the new node server nodes.
+Local data queries and cloud data queries return slightly different data.  From the 
+cloud we are able to get data averaged over various lengths of time.  For example
+we have access to the PM 2.5 value averaged over 24 hours. The local queries will only
+return the current PM 2.5 value.  The plug-in will create nodes with a different template
+for local and cloud configurations. 
 
-### Node Settings
-The settings for this node are:
+Another difference between local and cloud queries is in how often we check for new data.
+When querying data from the cloud, PurpleAir has requested that queries be limited to once
+every 10 minutes.  Local queries can be made as often as 1 every second although this may
+lead to high CPU usage on the Polisy/eisy so using 10 or more seconds is recommended.
 
-#### Short Poll
-   * How often to poll the PurpleAir service for current AQI data (in seconds)
-#### Long Poll
-   * Not used
-#### Custom Parameters
-   * A READ API Key from PurpleAir
-   * A list of PurpleAir devices to monitor. For the 'key', enter a name to use to identify the device (under 14 characters, no special characters). For the 'value' enter the PurpleAir sensor ID. This is typically just a number.
+You could configure the plug-in to get both the local and cloud based data but because of
+the time/averaging you may get different values returned for the same fields.
 
-## Node substitution variables
+
 ### Controller node
  * sys.node.[address].ST      (Node sever online)
 
-### Air Quality node
+### Local Air Quality node
+ * sys.node.[address].CLITEMP (current temperature)
+ * sys.node.[address].CLIHUM  (current humidity)
+ * sys.node.[address].BARPRES (current barometric pressure)
+ * sys.node.[address].DEWPT   (current dewponit)
+ * sys.node.[address].PM25    (current PM 2.5 value)
+ * sys.node.[address].PM10    (current PM 1.0 value)
+ * sys.node.[address].GV0     (current PM 10 value)
+ * sys.node.[address].AQI     (EPA Air Quality Index number)
+ * sys.node.[address].GV11    (EPA Air Quality Index category)
+ * sys.node.[address].GV12    (Data confidence)
+
+### Cloud Air Quality node
  * sys.node.[address].CLITEMP (current temperature)
  * sys.node.[address].CLIHUM  (current humidity)
  * sys.node.[address].BARPRES (current barometric pressure)
@@ -50,24 +57,5 @@ The settings for this node are:
 
 
 ## Requirements
-1. Polyglot V3.
-2. ISY firmware 5.3.x or later
-
-# Release Notes
-
-- 2.0.1 03/01/2022
-   - fix query for main node.
-- 2.0.0 03/01/2021
-   - Updated to run on Polyglot Version 3
-- 1.0.4 08/31/2020
-   - Fix confidence level calculation
-- 1.0.3 08/31/2020
-   - Remove test message
-   - Trap and report connection errors
-- 1.0.2 08/29/2020
-   - Change to allow multiple Purple air device nodes.
-- 1.0.1 08/29/2020
-   - Add data confidence 
-   - Fix typo
-- 1.0.0 08/27/2020
-   - Initial version.
+1. Polyglot PG3 or PG3x
+2. ISY firmware 5.7.x or later
