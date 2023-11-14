@@ -26,16 +26,14 @@ class SensorNode(udi_interface.Node):
                 'CLITEMP' : 17,
                 'CLIHUM' : 22,
                 'BARPRES' : 117,
-                'GV0' : 56,
+                'GV0' : 122,
                 'GV1' : 45,
-                'GV2' : 56,
-                'GV3' : 56,
-                'GV4' : 56,
-                'GV5' : 56,
-                'GV6' : 56,
-                'GV7' : 56,
-                'GV8' : 56,
-                'GV9' : 56,
+                'GV3' : 122,
+                'GV4' : 122,
+                'GV5' : 122,
+                'GV6' : 122,
+                'GV7' : 122,
+                'GV8' : 122,
                 'GV10' : 56,
                 'GV11' : 25,
                 'GV12' : 51,
@@ -46,20 +44,20 @@ class SensorNode(udi_interface.Node):
 
 
     drivers = [
-            {'driver': 'CLITEMP', 'value': 0, 'uom': 17},  # temperature
-            {'driver': 'CLIHUM', 'value': 0, 'uom': 22},   # humidity
-            {'driver': 'BARPRES', 'value': 0, 'uom': 117}, # pressure
-            {'driver': 'GV0', 'value': 0, 'uom': 56},      # current PM2.5
-            {'driver': 'GV1', 'value': 0, 'uom': 45},      # age in minutes
-            {'driver': 'GV3', 'value': 0, 'uom': 56},      # 10 min avg
-            {'driver': 'GV4', 'value': 0, 'uom': 56},      # 30 min avg
-            {'driver': 'GV5', 'value': 0, 'uom': 56},      # 60 min avg
-            {'driver': 'GV6', 'value': 0, 'uom': 56},      # 6 hr avg
-            {'driver': 'GV7', 'value': 0, 'uom': 56},      # 24 hr avg
-            {'driver': 'GV8', 'value': 0, 'uom': 56},      # 1 week avg
-            {'driver': 'GV10', 'value': 0, 'uom': 56},     # AQI
-            {'driver': 'GV11', 'value': 0, 'uom': 25},     # AQI string
-            {'driver': 'GV12', 'value': 0, 'uom': 51},     # confidence
+            {'driver': 'CLITEMP', 'value': 0, 'uom': 17, 'name':'Temperature'},  # temperature
+            {'driver': 'CLIHUM', 'value': 0, 'uom': 22, 'name':'Humidity'},   # humidity
+            {'driver': 'BARPRES', 'value': 0, 'uom': 117, 'name':'Pressure'}, # pressure
+            {'driver': 'GV0', 'value': 0, 'uom': 56, 'name':'Current PM 2.5'}, # current PM2.5
+            {'driver': 'GV1', 'value': 0, 'uom': 45, 'name':'Age'},      # age in minutes
+            {'driver': 'GV3', 'value': 0, 'uom': 56, 'name':'10 min Avg'},      # 10 min avg
+            {'driver': 'GV4', 'value': 0, 'uom': 56, 'name':'30 min Avg'},      # 30 min avg
+            {'driver': 'GV5', 'value': 0, 'uom': 56, 'name':'60 min Avg'},      # 60 min avg
+            {'driver': 'GV6', 'value': 0, 'uom': 56, 'name':'6 hour Avg'},      # 6 hr avg
+            {'driver': 'GV7', 'value': 0, 'uom': 56, 'name':'24 hour Avg'},      # 24 hr avg
+            {'driver': 'GV8', 'value': 0, 'uom': 56, 'name':'1 week Avg'},      # 1 week avg
+            {'driver': 'GV10', 'value': 0, 'uom': 56, 'name':'EPA AQI'},     # AQI
+            {'driver': 'GV11', 'value': 0, 'uom': 25, 'name':'AQI String'},     # AQI string
+            {'driver': 'GV12', 'value': 0, 'uom': 51, 'name':'Data Confidence'},     # confidence
             ]
 
 
@@ -67,8 +65,8 @@ class SensorNode(udi_interface.Node):
         self.poll('shortPoll')
 
     def configure(self, sensor, apikey):
-        #self.host = 'https://www.purpleair.com/json?show=' + sensor
-        self.host = 'https://api.purpleair.com/v1/sensors/' + sensor
+        fields='fields=name,model,temperature,humidity,pressure,pm2.5,pm2.5_10minute,pm2.5_30minute,pm2.5_60minute, pm2.5_6hour, pm2.5_24hour, pm2.5_1week,confidence,time_stamp,last_seen'
+        self.host = 'https://api.purpleair.com/v1/sensors/' + sensor + '&' + fields
         self.headers = {'X-API-Key':apikey}
         self.configured = True
 
