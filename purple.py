@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Polyglot v3 node server Purple Air data
-Copyright (C) 2020,2021 Robert Paauwe
+Copyright (C) 2020,2021,2023 Robert Paauwe
 """
 
 import udi_interface
@@ -14,7 +14,7 @@ LOGGER = udi_interface.LOGGER
 if __name__ == "__main__":
     try:
         polyglot = udi_interface.Interface([purpleair.Controller])
-        polyglot.start('2.0.2')
+        polyglot.start('2.1.0')
         control = purpleair.Controller(polyglot, "controller", "controller", "Purple Air AQI")
         polyglot.runForever()
     except (KeyboardInterrupt, SystemExit):
