@@ -91,9 +91,12 @@ class Controller(udi_interface.Node):
         self.reportDrivers()
 
     def valid_ip(self, ip_to_check):
+        LOGGER.info('Checking if {} is an IP Address'.format(ip_to_check))
         try:
-            socket.inet_aton(ip_to_check)
-            return True
+            host_bytes = ip_to_check.split('.')
+            valid = [int(b) for b in host_bytes]
+            valid = [b for b in valid if b >= 0 and b <= 255]
+            return len(host_bytes) == 4 and len(valid) == 4
         except Exception as e:
             LOGGER.error('valid ip: exception: {}'.format(e))
             return False
@@ -109,12 +112,15 @@ class Controller(udi_interface.Node):
 
             try:
                 if self.valid_ip(self.sensor_list[sensor_name]['id']):
+                    LOGGER.debug('Configuring local sensor node')
                     address = 'local_' + self.sensor_list[sensor_name]['id'].split('.')[3]
                     node = local.LocalSensorNode(self.poly, self.address, address, sensor_name)
                     node.configure(self.sensor_list[sensor_name]['id'])
                 else:
+                    LOGGER.debug('Configuring remote sensor node')
                     node = sensor.SensorNode(self.poly, self.address, self.sensor_list[sensor_name]['id'], sensor_name)
                     node.configure(self.sensor_list[sensor_name]['id'], self.apikey)
+
                 LOGGER.info('Adding new node for ' + sensor_name)
                 self.poly.addNode(node)
                 self.sensor_list[sensor_name]['configured'] = True

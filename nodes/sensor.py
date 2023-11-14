@@ -65,8 +65,9 @@ class SensorNode(udi_interface.Node):
         self.poll('shortPoll')
 
     def configure(self, sensor, apikey):
-        fields='fields=name,model,temperature,humidity,pressure,pm2.5,pm2.5_10minute,pm2.5_30minute,pm2.5_60minute, pm2.5_6hour, pm2.5_24hour, pm2.5_1week,confidence,time_stamp,last_seen'
-        self.host = 'https://api.purpleair.com/v1/sensors/' + sensor + '&' + fields
+        fields='fields=name,model,temperature,humidity,pressure,pm2.5,pm2.5_10minute,pm2.5_30minute,pm2.5_60minute, pm2.5_6hour, pm2.5_24hour, pm2.5_1week,confidence,last_seen'
+
+        self.host = 'https://api.purpleair.com/v1/sensors/' + sensor + '?' + fields
         self.headers = {'X-API-Key':apikey}
         self.configured = True
 
