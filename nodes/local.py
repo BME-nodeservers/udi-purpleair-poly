@@ -76,7 +76,7 @@ class LocalSensorNode(udi_interface.Node):
         self.poll('shortPoll')
 
     def configure(self, sensor):
-        self.host = 'http://{}/json'.format(sensor)
+        self.host = 'http://{}/json?live=true'.format(sensor)
         self.configured = True
 
     def update_driver(self, driver, value, force=False, prec=3):
