@@ -132,7 +132,12 @@ class LocalSensorNode(udi_interface.Node):
     # calculate the confidence by comparing PM2.5 channel A and channel B values
     def calculate_confidence(self, channel_a, channel_b):
 
-        C = 100 - abs(((channel_a - channel_b) / (channel_a + channel_b)) * 100)
+        try:
+            C = 100 - abs(((channel_a - channel_b) / (channel_a + channel_b)) * 100)
+        except Exception as e:
+            LOGGER.info('Both channels show 0 particulate matter, is this sensor working correctly?')
+            C = 100
+
         return round(C, 0)
 
 
