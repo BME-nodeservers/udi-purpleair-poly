@@ -149,7 +149,7 @@ class SensorNode(udi_interface.Node):
     def poll(self, polltype):
         # Query for the current air quality conditions. We can do this fairly
         # frequently, probably as often as once a minute.
-        if polltype is not 'shortPoll':
+        if polltype != 'shortPoll':
             return
 
         if not self.configured:
