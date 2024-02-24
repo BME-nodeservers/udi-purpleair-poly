@@ -212,7 +212,7 @@ class LocalSensorNode(udi_interface.Node):
                     LOGGER.info('AQI: {} vs. {} {}'.format(aqi, laqi, idx))
                 else: # indoor sensor
                     # using CF data
-                    if 'pm2_5_cf_1' in jdata:
+                    if 'pm2_5_cf_1' in jdata  and 'pm2_5_cf_1_b' in jdata:
                         pm25 = (jdata['pm2_5_cf_1'] + jdata['pm2_5_cf_1_b']) / 2
                         self.update_driver('PM25', round(pm25, 2))
 
@@ -222,15 +222,28 @@ class LocalSensorNode(udi_interface.Node):
                         confidence = self.calculate_confidence(jdata['pm2_5_cf_1'], jdata['pm2_5_cf_1_b'])
                         LOGGER.info('Data confidence level = {}%'.format(confidence))
                         self.update_driver('GV12', confidence)
+                    elif 'pm2_5_cf_1' in jdata:
+                        pm25 = jdata['pm2_5_cf_1']
+                        self.update_driver('PM25', round(pm25, 2))
+
+                        (aqi, idx) = self.epa_aqi(pm25)
+                        self.update_driver('GV11', idx)
+                        self.update_driver('GV12', 100)
                     if 'pm1_0_cf_1' in jdata:
                         pm10 = (jdata['pm1_0_cf_1'] + jdata['pm1_0_cf_1_b']) / 2
                         self.update_driver('PM10', round(pm10, 2))
+                    elif 'pm1_0_cf_1' in jdata:
+                        self.update_driver('PM10', round(jdata['pm1_0_cf_1'], 2))
                     if 'pm10_0_cf_1' in jdata and 'pm10_0_cf_1_b' in jdata:
                         pm10 = (jdata['pm10_0_cf_1'] + jdata['pm10_0_cf_1_b']) / 2
                         self.update_driver('GV0', round(pm10, 2))
+                    elif 'pm01_0_cf_1' in jdata:
+                        self.update_driver('GV0', round(jdata['pm01_0_cf_1'], 2))
                     if 'pm2.5_aqi' in jdata and 'pm2.5_aqi_b' in jdata:
                         laqi = (jdata['pm2.5_aqi'] + jdata['pm2.5_aqi_b']) / 2
                         self.update_driver('AQI', round(laqi, 0))
+                    elif 'pm2.5_aqi' in jdata:
+                        self.update_driver('AQI', round(jdata['pm2.5_aqi'], 2))
 
                     LOGGER.info('AQI: {} vs. {} {}'.format(aqi, laqi, idx))
             else:
