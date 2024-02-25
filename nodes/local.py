@@ -229,7 +229,7 @@ class LocalSensorNode(udi_interface.Node):
                         (aqi, idx) = self.epa_aqi(pm25)
                         self.update_driver('GV11', idx)
                         self.update_driver('GV12', 100)
-                    if 'pm1_0_cf_1' in jdata:
+                    if 'pm1_0_cf_1' in jdata and 'pm1_0_cf_1_b' in jdata:
                         pm10 = (jdata['pm1_0_cf_1'] + jdata['pm1_0_cf_1_b']) / 2
                         self.update_driver('PM10', round(pm10, 2))
                     elif 'pm1_0_cf_1' in jdata:
